@@ -2,6 +2,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.settings import api_settings
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from apps.api.permissions import RBACPermission
 from apps.auth_token.auth import ApiTokenAuthentication
 from apps.public_api.serializers import OrganizationSerializer
 from apps.public_api.throttlers.user_throttle import UserThrottle
@@ -15,7 +16,7 @@ class OrganizationView(
     ReadOnlyModelViewSet,
 ):
     authentication_classes = (ApiTokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, RBACPermission)
 
     throttle_classes = [UserThrottle]
 
@@ -23,6 +24,11 @@ class OrganizationView(
     serializer_class = OrganizationSerializer
 
     pagination_class = TwentyFivePageSizePaginator
+
+    rbac_permissions = {
+        "list": [RBACPermission.Permissions.ORGANIZATIONS_READ],
+        "retrieve": [RBACPermission.Permissions.ORGANIZATIONS_READ],
+    }
 
     def get_queryset(self):
         # It's a dirty hack to get queryset from the object. Just in case we'll return multiple teams in the future.

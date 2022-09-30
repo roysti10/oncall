@@ -2,7 +2,7 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.api.permissions import MODIFY_ACTIONS, READ_ACTIONS, IsAdmin
+from apps.api.permissions import RBACPermission
 from apps.api.serializers.public_api_token import PublicApiTokenSerializer
 from apps.auth_token.auth import PluginAuthentication
 from apps.auth_token.constants import MAX_PUBLIC_API_TOKENS_PER_USER
@@ -19,9 +19,14 @@ class PublicApiTokenView(
     viewsets.GenericViewSet,
 ):
     authentication_classes = [PluginAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    action_permissions = {IsAdmin: (*MODIFY_ACTIONS, *READ_ACTIONS)}
+    permission_classes = [IsAuthenticated, RBACPermission]
+    rbac_permissions = {
+        # TODO: what permissions should go here?
+        "list": [],
+        "retrieve": [],
+        "create": [],
+        "destroy": [],
+    }
 
     model = ApiAuthToken
     serializer_class = PublicApiTokenSerializer

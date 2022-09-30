@@ -15,14 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.api.permissions import (
-    MODIFY_ACTIONS,
-    READ_ACTIONS,
-    ActionPermission,
-    AnyRole,
-    IsAdminOrEditor,
-    IsOwnerOrAdmin,
-)
+from apps.api.permissions import RBACPermission
 from apps.api.serializers.user import FilterUserSerializer, UserHiddenFieldsSerializer, UserSerializer
 from apps.auth_token.auth import (
     MobileAppAuthTokenAuthentication,
@@ -92,11 +85,10 @@ class UserFilter(filters.FilterSet):
     """
 
     email = filters.CharFilter(field_name="email", lookup_expr="icontains")
-    roles = filters.MultipleChoiceFilter(field_name="role", choices=Role.choices())
 
     class Meta:
         model = User
-        fields = ["email", "roles"]
+        fields = ["email"]
 
 
 class UserView(
@@ -112,50 +104,52 @@ class UserView(
         PluginAuthentication,
     )
 
-    permission_classes = (IsAuthenticated, ActionPermission)
+    permission_classes = (IsAuthenticated, RBACPermission)
 
     # Non-admin users are allowed to list and retrieve users
     # The overridden get_serializer_class will return
     # another Serializer for non-admin users with sensitive information hidden
-    action_permissions = {
-        IsAdminOrEditor: (
-            *MODIFY_ACTIONS,
-            "list",
-            "metadata",
-            "verify_number",
-            "forget_number",
-            "get_verification_code",
-            "get_backend_verification_code",
-            "get_telegram_verification_code",
-            "unlink_slack",
-            "unlink_telegram",
-            "unlink_backend",
-            "make_test_call",
-            "export_token",
-            "mobile_app_verification_token",
-            "mobile_app_auth_token",
-        ),
-        AnyRole: ("retrieve", "timezone_options"),
+    rbac_permissions = {
+        # TODO: what permissions should go here?
+        "list": [],
+        "retrieve": [],
+        "create": [],
+        "update": [],
+        "destroy": [],
+        "verify_number": [],
+        "forget_number": [],
+        "get_verification_code": [],
+        "get_backend_verification_code": [],
+        "get_telegram_verification_code": [],
+        "unlink_slack": [],
+        "unlink_telegram": [],
+        "unlink_backend": [],
+        "make_test_call": [],
+        "export_token": [],
+        "mobile_app_verification_token": [],
+        "mobile_app_auth_token": [],
+        "timezone_options": [],
     }
 
-    action_object_permissions = {
-        IsOwnerOrAdmin: (
-            *MODIFY_ACTIONS,
-            *READ_ACTIONS,
-            "verify_number",
-            "forget_number",
-            "get_verification_code",
-            "get_backend_verification_code",
-            "get_telegram_verification_code",
-            "unlink_slack",
-            "unlink_telegram",
-            "unlink_backend",
-            "make_test_call",
-            "export_token",
-            "mobile_app_verification_token",
-            "mobile_app_auth_token",
-        ),
-    }
+    # TODO: what to do with this?
+    # action_object_permissions = {
+    #     IsOwnerOrAdmin: (
+    #         *MODIFY_ACTIONS,
+    #         *READ_ACTIONS,
+    #         "verify_number",
+    #         "forget_number",
+    #         "get_verification_code",
+    #         "get_backend_verification_code",
+    #         "get_telegram_verification_code",
+    #         "unlink_slack",
+    #         "unlink_telegram",
+    #         "unlink_backend",
+    #         "make_test_call",
+    #         "export_token",
+    #         "mobile_app_verification_token",
+    #         "mobile_app_auth_token",
+    #     ),
+    # }
 
     filter_serializer_class = FilterUserSerializer
 
@@ -184,6 +178,7 @@ class UserView(
         is_users_own_data = (
             self.kwargs.get("pk") is not None and self.kwargs.get("pk") == self.request.user.public_primary_key
         )
+        # TODO: should we not look @ role here?
         if is_users_own_data or self.request.user.role == Role.ADMIN:
             return UserSerializer
         return UserHiddenFieldsSerializer

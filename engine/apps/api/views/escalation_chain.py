@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.alerts.models import EscalationChain
-from apps.api.permissions import MODIFY_ACTIONS, READ_ACTIONS, ActionPermission, AnyRole, IsAdmin
+from apps.api.permissions import RBACPermission
 from apps.api.serializers.escalation_chain import EscalationChainListSerializer, EscalationChainSerializer
 from apps.auth_token.auth import PluginAuthentication
 from common.api_helpers.exceptions import BadRequest
@@ -17,11 +17,17 @@ from common.insight_log import EntityEvent, write_resource_insight_log
 
 class EscalationChainViewSet(PublicPrimaryKeyMixin, ListSerializerMixin, viewsets.ModelViewSet):
     authentication_classes = (PluginAuthentication,)
-    permission_classes = (IsAuthenticated, ActionPermission)
+    permission_classes = (IsAuthenticated, RBACPermission)
 
-    action_permissions = {
-        IsAdmin: (*MODIFY_ACTIONS, "copy"),
-        AnyRole: (*READ_ACTIONS, "details"),
+    rbac_permissions = {
+        # TODO: what permissions should go here?
+        "list": [],
+        "retrieve": [],
+        "create": [],
+        "update": [],
+        "destroy": [],
+        "copy": [],
+        "details": [],
     }
 
     filter_backends = [SearchFilter]

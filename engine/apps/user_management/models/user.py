@@ -76,6 +76,7 @@ class UserManager(models.Manager):
         for user in organization.users.filter(user_id__in=existing_user_ids):
             grafana_user = grafana_users[user.user_id]
             g_user_role = Role[grafana_user["role"].upper()]
+
             if (
                 user.email != grafana_user["email"]
                 or user.name != grafana_user["name"]
@@ -134,7 +135,6 @@ class User(models.Model):
     email = models.EmailField()
     name = models.CharField(max_length=300)
     username = models.CharField(max_length=300)
-    role = models.PositiveSmallIntegerField(choices=Role.choices())
     avatar_url = models.URLField()
 
     # don't use "_timezone" directly, use the "timezone" property since it can be populated via slack user identity
@@ -181,11 +181,13 @@ class User(models.Model):
     def is_telegram_connected(self):
         return hasattr(self, "telegram_connection")
 
+    # TODO:
     def self_or_admin(self, user_to_check, organization) -> bool:
         return user_to_check.pk == self.pk or (
             user_to_check.role == Role.ADMIN and organization.pk == user_to_check.organization_id
         )
 
+    # TODO:
     @property
     def is_notification_allowed(self):
         return self.role in (Role.ADMIN, Role.EDITOR)

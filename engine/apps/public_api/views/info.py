@@ -12,6 +12,8 @@ class InfoView(APIView):
 
     throttle_classes = [InfoThrottler]
 
+    # TODO: should this have a permission?
+
     def get(self, request):
         response = {"url": self.request.auth.organization.grafana_url}
         return Response(response)

@@ -7,6 +7,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from apps.alerts.models import AlertGroup
 from apps.alerts.tasks import delete_alert_group, wipe
+from apps.api.permissions import RBACPermission
 from apps.auth_token.auth import ApiTokenAuthentication
 from apps.public_api.constants import VALID_DATE_FOR_DELETE_INCIDENT
 from apps.public_api.helpers import is_valid_group_creation_date, team_has_slack_token_for_deleting
@@ -31,7 +32,7 @@ class IncidentByTeamFilter(ByTeamModelFieldFilterMixin, filters.FilterSet):
 
 class IncidentView(RateLimitHeadersMixin, mixins.ListModelMixin, mixins.DestroyModelMixin, GenericViewSet):
     authentication_classes = (ApiTokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, RBACPermission)
 
     throttle_classes = [UserThrottle]
 
@@ -41,6 +42,12 @@ class IncidentView(RateLimitHeadersMixin, mixins.ListModelMixin, mixins.DestroyM
 
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = IncidentByTeamFilter
+
+    rbac_permissions = {
+        "list": [RBACPermission.Permissions.ALERT_GROUPS_READ],
+        "retrieve": [RBACPermission.Permissions.ALERT_GROUPS_READ],
+        "destroy": [RBACPermission.Permissions.ALERT_GROUPS_WRITE],
+    }
 
     def get_queryset(self):
         route_id = self.request.query_params.get("route_id", None)

@@ -25,6 +25,8 @@ class ActionView(RateLimitHeadersMixin, PublicPrimaryKeyMixin, UpdateSerializerM
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ByTeamFilter
 
+    # TODO: should we add permissions to these endpoints?
+
     def get_queryset(self):
         action_name = self.request.query_params.get("name", None)
         queryset = CustomButton.objects.filter(organization=self.request.auth.organization)

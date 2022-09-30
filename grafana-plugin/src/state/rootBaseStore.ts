@@ -31,8 +31,11 @@ import { UserGroupStore } from 'models/user_group/user_group';
 import { makeRequest } from 'network';
 
 import { AppFeature } from './features';
-import { createGrafanaToken, getPluginSyncStatus, installPlugin, startPluginSync, updateGrafanaToken } from './plugin';
+import { getPluginSyncStatus, installPlugin, startPluginSync } from './plugin';
 import { UserAction } from './userAction';
+
+// @ts-ignore
+import { contextSrv } from 'grafana/app/core/core';
 
 // ------ Dashboard ------ //
 
@@ -56,6 +59,7 @@ export class RootBaseStore {
   correctProvisioningForInstallation = true;
 
   @observable
+  // TODO: this should probably change?
   correctRoleForInstallation = true;
 
   @observable
@@ -134,15 +138,6 @@ export class RootBaseStore {
     this.escalationPolicyStore.updateNumMinutesInWindowOptions();
   }
 
-  async getUserRole() {
-    const user = await getBackendSrv().get('/api/user');
-    const userRoles = await getBackendSrv().get('/api/user/orgs');
-    const userRole = userRoles.find(
-      (userRole: { name: string; orgId: number; role: string }) => userRole.orgId === user.orgId
-    );
-    return userRole.role;
-  }
-
   async finishSync(get_sync_response: any) {
     if (!get_sync_response.token_ok) {
       this.initializationError = 'OnCall was not able to connect back to this Grafana';
@@ -201,7 +196,8 @@ export class RootBaseStore {
         this.signupAllowedForPlugin = false;
         return;
       }
-      const userRole = await this.getUserRole();
+      // TODO: what to do here?!?!
+      const userRole = 'Admin';
       if (userRole !== 'Admin') {
         this.correctRoleForInstallation = false;
         return;
@@ -233,7 +229,9 @@ export class RootBaseStore {
   }
 
   isUserActionAllowed(action: UserAction) {
-    return this.userStore.currentUser && this.userStore.currentUser.permissions.includes(action);
+    // https://github.com/grafana/grafana/blob/main/public/app/core/services/context_srv.ts#L165-L170
+    // TODO: what to assign fallback (2nd argument) to?
+    return contextSrv.hasAccess(action, true);
   }
 
   hasFeature(feature: string | AppFeature) {

@@ -10,12 +10,10 @@ import GTable from 'components/GTable/GTable';
 import PluginLink from 'components/PluginLink/PluginLink';
 import Text from 'components/Text/Text';
 import WithConfirm from 'components/WithConfirm/WithConfirm';
-import GSelect from 'containers/GSelect/GSelect';
 import OutgoingWebhookForm from 'containers/OutgoingWebhookForm/OutgoingWebhookForm';
 import { WithPermissionControl } from 'containers/WithPermissionControl/WithPermissionControl';
 import { ActionDTO } from 'models/action';
 import { OutgoingWebhook } from 'models/outgoing_webhook/outgoing_webhook.types';
-import { PRIVATE_CHANNEL_NAME } from 'models/slack_channel/slack_channel.config';
 import { WithStoreProps } from 'state/types';
 import { UserAction } from 'state/userAction';
 import { withMobXProviderContext } from 'state/withStore';
@@ -97,9 +95,9 @@ class OutgoingWebhooks extends React.Component<OutgoingWebhooksProps, OutgoingWe
                 <PluginLink
                   partial
                   query={{ id: 'new' }}
-                  disabled={!store.isUserActionAllowed(UserAction.UpdateCustomActions)}
+                  disabled={!store.isUserActionAllowed(UserAction.OutgoingWebhooksWrite)}
                 >
-                  <WithPermissionControl userAction={UserAction.UpdateCustomActions}>
+                  <WithPermissionControl userAction={UserAction.OutgoingWebhooksWrite}>
                     <Button variant="primary" icon="plus">
                       Create
                     </Button>
@@ -126,12 +124,12 @@ class OutgoingWebhooks extends React.Component<OutgoingWebhooksProps, OutgoingWe
   renderActionButtons = (record: ActionDTO) => {
     return (
       <HorizontalGroup justify="flex-end">
-        <WithPermissionControl key={'edit_action'} userAction={UserAction.UpdateCustomActions}>
+        <WithPermissionControl key={'edit_action'} userAction={UserAction.OutgoingWebhooksWrite}>
           <Button onClick={this.getEditClickHandler(record.id)} fill="text">
             Edit
           </Button>
         </WithPermissionControl>
-        <WithPermissionControl key={'delete_action'} userAction={UserAction.UpdateCustomActions}>
+        <WithPermissionControl key={'delete_action'} userAction={UserAction.OutgoingWebhooksWrite}>
           <WithConfirm>
             <Button onClick={this.getDeleteClickHandler(record.id)} fill="text" variant="destructive">
               Delete

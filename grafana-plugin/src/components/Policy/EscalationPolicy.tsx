@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from 'react';
 
 import { SelectableValue } from '@grafana/data';
-import { Button, Input, Select, Tooltip, IconButton } from '@grafana/ui';
+import { Button, Input, Select, IconButton } from '@grafana/ui';
 import cn from 'classnames/bind';
 import moment from 'moment-timezone';
 import { SortableElement } from 'react-sortable-hoc';
@@ -14,14 +14,11 @@ import GSelect from 'containers/GSelect/GSelect';
 import RemoteSelect from 'containers/RemoteSelect/RemoteSelect';
 import UserTooltip from 'containers/UserTooltip/UserTooltip';
 import { WithPermissionControl } from 'containers/WithPermissionControl/WithPermissionControl';
-import { ActionDTO } from 'models/action';
 import { prepareEscalationPolicy } from 'models/escalation_policy/escalation_policy.helpers';
 import {
   EscalationPolicy as EscalationPolicyType,
   EscalationPolicyOption,
 } from 'models/escalation_policy/escalation_policy.types';
-import { PRIVATE_CHANNEL_NAME } from 'models/slack_channel/slack_channel.config';
-import { User, UserRole } from 'models/user/user.types';
 import { WaitDelay } from 'models/wait_delay';
 import { SelectOption } from 'state/types';
 import { UserAction } from 'state/userAction';
@@ -57,14 +54,14 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
 
     return (
       <Timeline.Item key={id} contentClassName={cx('root')} number={number} color={color}>
-        <WithPermissionControl disableByPaywall userAction={UserAction.UpdateEscalationPolicies}>
+        <WithPermissionControl disableByPaywall userAction={UserAction.EscalationChainsWrite}>
           <DragHandle />
         </WithPermissionControl>
         {escalationOption &&
           reactStringReplace(escalationOption.display_name, /\{\{([^}]+)\}\}/g, this.replacePlaceholder)}
         {this._renderNote()}
         {is_final ? null : (
-          <WithPermissionControl className={cx('delete')} userAction={UserAction.UpdateEscalationPolicies}>
+          <WithPermissionControl className={cx('delete')} userAction={UserAction.EscalationChainsWrite}>
             <IconButton
               name="trash-alt"
               className={cx('delete', 'control')}
@@ -138,7 +135,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
     const { notify_to_users_queue } = data;
 
     return (
-      <WithPermissionControl key="users-multiple" disableByPaywall userAction={UserAction.UpdateEscalationPolicies}>
+      <WithPermissionControl key="users-multiple" disableByPaywall userAction={UserAction.EscalationChainsWrite}>
         <GSelect
           isMulti
           showSearch
@@ -161,7 +158,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
     const { important } = data;
 
     return (
-      <WithPermissionControl key="importance" disableByPaywall userAction={UserAction.UpdateEscalationPolicies}>
+      <WithPermissionControl key="importance" disableByPaywall userAction={UserAction.EscalationChainsWrite}>
         <Select
           menuShouldPortal
           className={cx('select', 'control')}
@@ -181,7 +178,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
     const { data } = this.props;
 
     return (
-      <WithPermissionControl key="time-range" disableByPaywall userAction={UserAction.UpdateEscalationPolicies}>
+      <WithPermissionControl key="time-range" disableByPaywall userAction={UserAction.EscalationChainsWrite}>
         <TimeRange
           from={data.from_time}
           to={data.to_time}
@@ -197,7 +194,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
     const { wait_delay } = data;
 
     return (
-      <WithPermissionControl key="wait-delay" disableByPaywall userAction={UserAction.UpdateEscalationPolicies}>
+      <WithPermissionControl key="wait-delay" disableByPaywall userAction={UserAction.EscalationChainsWrite}>
         <Select
           menuShouldPortal
           placeholder="Select Wait Delay"
@@ -222,7 +219,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
       <WithPermissionControl
         key="num_alerts_in_window"
         disableByPaywall
-        userAction={UserAction.UpdateEscalationPolicies}
+        userAction={UserAction.EscalationChainsWrite}
       >
         <Input
           placeholder="Count"
@@ -248,7 +245,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
       <WithPermissionControl
         key="num_minutes_in_window"
         disableByPaywall
-        userAction={UserAction.UpdateEscalationPolicies}
+        userAction={UserAction.EscalationChainsWrite}
       >
         <Select
           menuShouldPortal
@@ -271,7 +268,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
     const { notify_schedule } = data;
 
     return (
-      <WithPermissionControl key="notify_schedule" disableByPaywall userAction={UserAction.UpdateEscalationPolicies}>
+      <WithPermissionControl key="notify_schedule" disableByPaywall userAction={UserAction.EscalationChainsWrite}>
         <RemoteSelect
           showSearch={false}
           className={cx('select', 'control')}
@@ -291,7 +288,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
     const { notify_to_group } = data;
 
     return (
-      <WithPermissionControl key="notify_to_group" disableByPaywall userAction={UserAction.UpdateEscalationPolicies}>
+      <WithPermissionControl key="notify_to_group" disableByPaywall userAction={UserAction.EscalationChainsWrite}>
         <GSelect
           modelName="userGroupStore"
           displayField="name"
@@ -310,7 +307,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
     const { custom_button_trigger } = data;
 
     return (
-      <WithPermissionControl key="custom-button" disableByPaywall userAction={UserAction.UpdateEscalationPolicies}>
+      <WithPermissionControl key="custom-button" disableByPaywall userAction={UserAction.EscalationChainsWrite}>
         <GSelect
           modelName="outgoingWebhookStore"
           displayField="name"

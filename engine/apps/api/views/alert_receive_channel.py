@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from apps.alerts.models import AlertReceiveChannel
-from apps.api.permissions import MODIFY_ACTIONS, READ_ACTIONS, ActionPermission, AnyRole, IsAdmin, IsAdminOrEditor
+from apps.api.permissions import RBACPermission
 from apps.api.serializers.alert_receive_channel import (
     AlertReceiveChannelSerializer,
     AlertReceiveChannelUpdateSerializer,
@@ -64,19 +64,7 @@ class AlertReceiveChannelView(
     ModelViewSet,
 ):
     authentication_classes = (PluginAuthentication,)
-    permission_classes = (IsAuthenticated, ActionPermission)
-    action_permissions = {
-        IsAdmin: (*MODIFY_ACTIONS, "stop_maintenance", "start_maintenance", "change_team"),
-        IsAdminOrEditor: ("send_demo_alert", "preview_template"),
-        AnyRole: (
-            *READ_ACTIONS,
-            "integration_options",
-            "maintenance_duration_options",
-            "maintenance_mode_options",
-            "counters",
-            "counters_per_integration",
-        ),
-    }
+    permission_classes = (IsAuthenticated, RBACPermission)
 
     model = AlertReceiveChannel
     serializer_class = AlertReceiveChannelSerializer
@@ -87,6 +75,19 @@ class AlertReceiveChannelView(
     search_fields = ("verbal_name",)
 
     filterset_class = AlertReceiveChannelFilter
+
+    rbac_permissions = {
+        "list": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_READ],
+        "retrieve": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_READ],
+        "integration_options": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_READ],
+        "counters": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_READ],
+        "counters_per_integration": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_READ],
+        "create": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_WRITE],
+        "update": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_WRITE],
+        "destroy": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_WRITE],
+        "send_demo_alert": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_WRITE],
+        "change_team": [RBACPermission.Permissions.ALERT_RECEIVE_CHANNELS_WRITE],
+    }
 
     def create(self, request, *args, **kwargs):
         if request.data["integration"] is not None and (

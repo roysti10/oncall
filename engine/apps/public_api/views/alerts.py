@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
 from apps.alerts.models import Alert
+from apps.api.permissions import RBACPermission
 from apps.auth_token.auth import ApiTokenAuthentication
 from apps.public_api.serializers.alerts import AlertSerializer
 from apps.public_api.throttlers.user_throttle import UserThrottle
@@ -21,6 +22,10 @@ class AlertView(RateLimitHeadersMixin, mixins.ListModelMixin, GenericViewSet):
     model = Alert
     serializer_class = AlertSerializer
     pagination_class = FiftyPageSizePaginator
+
+    rbac_permissions = {
+        "list": [RBACPermission.Permissions.ALERT_GROUPS_READ],
+    }
 
     def get_queryset(self):
         alert_group_id = self.request.query_params.get("alert_group_id", None)

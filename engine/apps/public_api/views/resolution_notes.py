@@ -27,6 +27,8 @@ class ResolutionNoteView(RateLimitHeadersMixin, UpdateSerializerMixin, ModelView
 
     pagination_class = FiftyPageSizePaginator
 
+    # TODO: what permissions should this fall under?
+
     def get_queryset(self):
         alert_group_id = self.request.query_params.get("alert_group_id", None)
         queryset = ResolutionNote.objects.filter(

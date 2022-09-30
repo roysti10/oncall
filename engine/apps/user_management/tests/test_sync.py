@@ -19,7 +19,6 @@ def test_sync_users_for_organization(make_organization, make_user_for_organizati
             "email": "test@test.test",
             "name": "Test",
             "login": "test",
-            "role": "admin",
             "avatarUrl": "test.test/test",
         }
         for user_id in (2, 3)
@@ -108,7 +107,6 @@ def test_sync_organization(
             "email": "test@test.test",
             "name": "Test",
             "login": "test",
-            "role": "admin",
             "avatarUrl": "test.test/test",
         },
     )
@@ -174,7 +172,6 @@ def test_duplicate_user_ids(make_organization, make_user_for_organization):
             "email": "newtest@test.test",
             "name": "New Test",
             "login": "test",
-            "role": "admin",
             "avatarUrl": "test.test/test",
         }
     ]

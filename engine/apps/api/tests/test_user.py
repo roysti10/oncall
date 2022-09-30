@@ -8,7 +8,6 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APIClient
 
-from apps.base.constants import ADMIN_PERMISSIONS, EDITOR_PERMISSIONS
 from apps.base.models import UserNotificationPolicy
 from apps.user_management.models.user import default_working_hours
 from common.constants.role import Role
@@ -80,7 +79,7 @@ def test_update_user_cant_change_email_and_username(
             }
         },
         "cloud_connection_status": 0,
-        "permissions": ADMIN_PERMISSIONS,
+        "permissions": [],
         "notification_chain_verbal": {"default": "", "important": ""},
         "slack_user_identity": None,
         "avatar": admin.avatar_url,
@@ -128,7 +127,7 @@ def test_list_users(
                         "user": admin.username,
                     }
                 },
-                "permissions": ADMIN_PERMISSIONS,
+                "permissions": [],
                 "notification_chain_verbal": {"default": "", "important": ""},
                 "slack_user_identity": None,
                 "avatar": admin.avatar_url,
@@ -152,7 +151,7 @@ def test_list_users(
                         "user": editor.username,
                     }
                 },
-                "permissions": EDITOR_PERMISSIONS,
+                "permissions": [],
                 "notification_chain_verbal": {"default": "", "important": ""},
                 "slack_user_identity": None,
                 "avatar": editor.avatar_url,

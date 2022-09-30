@@ -19,6 +19,8 @@ class UserGroupView(RateLimitHeadersMixin, mixins.ListModelMixin, GenericViewSet
     model = SlackUserGroup
     serializer_class = UserGroupSerializer
 
+    # TODO: what permissions should this fall under?
+
     def get_queryset(self):
         slack_handle = self.request.query_params.get("slack_handle", None)
         queryset = SlackUserGroup.objects.filter(

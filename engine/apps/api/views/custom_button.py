@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from apps.alerts.models import AlertGroup, CustomButton
 from apps.alerts.tasks.custom_button_result import custom_button_result
-from apps.api.permissions import MODIFY_ACTIONS, READ_ACTIONS, ActionPermission, AnyRole, IsAdmin, IsAdminOrEditor
+from apps.api.permissions import RBACPermission
 from apps.api.serializers.custom_button import CustomButtonSerializer
 from apps.auth_token.auth import PluginAuthentication
 from common.api_helpers.exceptions import BadRequest
@@ -18,11 +18,16 @@ from common.insight_log import EntityEvent, write_resource_insight_log
 
 class CustomButtonView(PublicPrimaryKeyMixin, ModelViewSet):
     authentication_classes = (PluginAuthentication,)
-    permission_classes = (IsAuthenticated, ActionPermission)
-    action_permissions = {
-        IsAdmin: MODIFY_ACTIONS,
-        IsAdminOrEditor: ("action",),
-        AnyRole: READ_ACTIONS,
+    permission_classes = (IsAuthenticated, RBACPermission)
+
+    rbac_permissions = {
+        # TODO: what permissions should go here?
+        "list": [],
+        "retrieve": [],
+        "create": [],
+        "update": [],
+        "destory": [],
+        "action": [],
     }
 
     model = CustomButton

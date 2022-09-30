@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+import typing
 from typing import Optional, Tuple
 from urllib.parse import urljoin
 
@@ -69,6 +70,8 @@ class APIClient:
 
 
 class GrafanaAPIClient(APIClient):
+    from apps.api.permissions import RBACPermission
+
     def __init__(self, api_url: str, api_token: str):
         super().__init__(api_url, api_token)
 
@@ -118,6 +121,23 @@ class GrafanaAPIClient(APIClient):
 
     def update_alerting_config(self, recipient, config):
         return self.api_post(f"api/alertmanager/{recipient}/config/api/v1/alerts", config)
+
+    def user_has_permission(
+        self, user_id: int, action: RBACPermission.Permissions, scope: typing.Optional[str] = None
+    ) -> bool:
+        action = action.value
+        data, resp = self.api_post(
+            f"api/access-control/user/{user_id}/evaluation",
+            {
+                "action": action
+                # TODO: how to check permission for a particular scope?
+            },
+        )
+
+        if resp["status_code"] != 200:
+            return False
+        # TODO: will the nested "-" be the final design?
+        return data and data.get("-", {}).get(action, False) is True
 
 
 class GcomAPIClient(APIClient):

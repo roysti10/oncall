@@ -132,7 +132,7 @@ const PhoneVerification = observer((props: PhoneVerificationProps) => {
   const showPhoneInputError = phoneHasMinimumLength && !isPhoneValid && !isPhoneNumberHidden && !isLoading;
 
   const isCurrent = userStore.currentUserPk === user.pk;
-  const action = isCurrent ? UserAction.UpdateOwnSettings : UserAction.UpdateOtherUsersSettings;
+  const action = isCurrent ? UserAction.OwnSettingsWrite : UserAction.OthersSettingsWrite;
   const isButtonDisabled =
     phone === user.verified_phone_number || (!isCodeSent && !isPhoneValid) || !isTwilioConfigured;
 
@@ -259,7 +259,7 @@ function ForgetPhoneScreen({ phone, onCancel, onForget }: ForgetPhoneScreenProps
 }
 
 interface PhoneVerificationButtonsGroupProps {
-  action: UserAction.UpdateOwnSettings | UserAction.UpdateOtherUsersSettings;
+  action: UserAction.OwnSettingsWrite | UserAction.OthersSettingsWrite;
 
   isCodeSent: boolean;
   isButtonDisabled: boolean;

@@ -6,7 +6,7 @@ from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from telegram import error
 
-from apps.api.permissions import IsAdmin
+from apps.api.permissions import RBACPermission
 from apps.api.serializers.live_setting import LiveSettingSerializer
 from apps.auth_token.auth import PluginAuthentication
 from apps.base.models import LiveSetting
@@ -21,7 +21,15 @@ from common.api_helpers.mixins import PublicPrimaryKeyMixin
 class LiveSettingViewSet(PublicPrimaryKeyMixin, viewsets.ModelViewSet):
     serializer_class = LiveSettingSerializer
     authentication_classes = (PluginAuthentication,)
-    permission_classes = (IsAuthenticated, IsAdmin)
+    permission_classes = (IsAuthenticated, RBACPermission)
+    rbac_permissions = {
+        # TODO: what permissions should go here?
+        "list": [],
+        "retrieve": [],
+        "create": [],
+        "update": [],
+        "destroy": [],
+    }
 
     def dispatch(self, request, *args, **kwargs):
         if not settings.FEATURE_LIVE_SETTINGS_ENABLED:

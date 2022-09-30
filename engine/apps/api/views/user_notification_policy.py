@@ -7,14 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from apps.api.permissions import (
-    MODIFY_ACTIONS,
-    READ_ACTIONS,
-    ActionPermission,
-    AnyRole,
-    IsAdminOrEditor,
-    IsOwnerOrAdmin,
-)
+from apps.api.permissions import RBACPermission
 from apps.api.serializers.user_notification_policy import (
     UserNotificationPolicySerializer,
     UserNotificationPolicyUpdateSerializer,
@@ -32,18 +25,29 @@ from common.insight_log import EntityEvent, write_resource_insight_log
 
 class UserNotificationPolicyView(UpdateSerializerMixin, ModelViewSet):
     authentication_classes = (PluginAuthentication,)
-    permission_classes = (IsAuthenticated, ActionPermission)
+    permission_classes = (IsAuthenticated, RBACPermission)
 
-    action_permissions = {
-        IsAdminOrEditor: (*MODIFY_ACTIONS, "move_to_position"),
-        AnyRole: (*READ_ACTIONS, "delay_options", "notify_by_options"),
-    }
-    action_object_permissions = {
-        IsOwnerOrAdmin: (*MODIFY_ACTIONS, "move_to_position"),
-        AnyRole: READ_ACTIONS,
-    }
+    # TODO: what to do with this?
+    # action_permissions = {
+    #     IsAdminOrEditor: (*MODIFY_ACTIONS, "move_to_position"),
+    #     AnyRole: (*READ_ACTIONS, "delay_options", "notify_by_options"),
+    # }
+    # action_object_permissions = {
+    #     IsOwnerOrAdmin: (*MODIFY_ACTIONS, "move_to_position"),
+    #     AnyRole: READ_ACTIONS,
+    # }
 
-    ownership_field = "user"
+    rbac_permissions = {
+        # TODO: what permissions should go here?
+        "list": [],
+        "retrieve": [],
+        "create": [],
+        "update": [],
+        "destroy": [],
+        "move_to_position": [],
+        "delay_options": [],
+        "notify_by_options": [],
+    }
 
     model = UserNotificationPolicy
     serializer_class = UserNotificationPolicySerializer

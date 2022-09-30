@@ -30,6 +30,8 @@ class ChannelFilterView(RateLimitHeadersMixin, UpdateSerializerMixin, ModelViewS
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["alert_receive_channel"]
 
+    # TODO: what permissions should this fall under?
+
     def get_queryset(self):
         integration_id = self.request.query_params.get("integration_id", None)
         routing_regex = self.request.query_params.get("routing_regex", None)

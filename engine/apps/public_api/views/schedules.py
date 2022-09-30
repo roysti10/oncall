@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
 from rest_framework.viewsets import ModelViewSet
 
+from apps.api.permissions import RBACPermission
 from apps.auth_token.auth import ApiTokenAuthentication, ScheduleExportAuthentication
 from apps.public_api.custom_renderers import CalendarRenderer
 from apps.public_api.serializers import PolymorphicScheduleSerializer, PolymorphicScheduleUpdateSerializer
@@ -22,7 +23,7 @@ from common.insight_log import EntityEvent, write_resource_insight_log
 
 class OnCallScheduleChannelView(RateLimitHeadersMixin, UpdateSerializerMixin, ModelViewSet):
     authentication_classes = (ApiTokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, RBACPermission)
 
     throttle_classes = [UserThrottle]
 
@@ -34,6 +35,15 @@ class OnCallScheduleChannelView(RateLimitHeadersMixin, UpdateSerializerMixin, Mo
 
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ByTeamFilter
+
+    rbac_permissions = {
+        "list": [RBACPermission.Permissions.SCHEDULES_READ],
+        "retrieve": [RBACPermission.Permissions.SCHEDULES_READ],
+        "create": [RBACPermission.Permissions.SCHEDULES_WRITE],
+        "update": [RBACPermission.Permissions.SCHEDULES_WRITE],
+        "destroy": [RBACPermission.Permissions.SCHEDULES_WRITE],
+        "export": [RBACPermission.Permissions.SCHEDULES_WRITE],
+    }
 
     def get_queryset(self):
         name = self.request.query_params.get("name", None)
@@ -112,7 +122,7 @@ class OnCallScheduleChannelView(RateLimitHeadersMixin, UpdateSerializerMixin, Mo
         detail=True,
         renderer_classes=(CalendarRenderer,),
         authentication_classes=(ScheduleExportAuthentication,),
-        permission_classes=(IsAuthenticated,),
+        permission_classes=(IsAuthenticated, RBACPermission),
     )
     def export(self, request, pk):
         # Not using existing get_object method because it requires access to the organization user attribute

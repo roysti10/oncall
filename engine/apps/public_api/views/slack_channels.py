@@ -19,6 +19,8 @@ class SlackChannelView(RateLimitHeadersMixin, mixins.ListModelMixin, GenericView
     model = SlackChannel
     serializer_class = SlackChannelSerializer
 
+    # TODO: what permissions should this fall under?
+
     def get_queryset(self):
         channel_name = self.request.query_params.get("channel_name", None)
 

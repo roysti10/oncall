@@ -14,7 +14,7 @@ from rest_framework.views import Response
 from rest_framework.viewsets import ModelViewSet
 
 from apps.alerts.models import EscalationChain
-from apps.api.permissions import MODIFY_ACTIONS, READ_ACTIONS, ActionPermission, AnyRole, IsAdmin, IsAdminOrEditor
+from apps.api.permissions import RBACPermission
 from apps.api.serializers.schedule_base import ScheduleFastSerializer
 from apps.api.serializers.schedule_polymorphic import (
     PolymorphicScheduleCreateSerializer,
@@ -46,24 +46,25 @@ class ScheduleView(
     PublicPrimaryKeyMixin, ShortSerializerMixin, CreateSerializerMixin, UpdateSerializerMixin, ModelViewSet
 ):
     authentication_classes = (PluginAuthentication,)
-    permission_classes = (IsAuthenticated, ActionPermission)
-    action_permissions = {
-        IsAdmin: (
-            *MODIFY_ACTIONS,
-            "reload_ical",
-        ),
-        IsAdminOrEditor: ("export_token",),
-        AnyRole: (
-            *READ_ACTIONS,
-            "events",
-            "filter_events",
-            "next_shifts_per_user",
-            "notify_empty_oncall_options",
-            "notify_oncall_shift_freq_options",
-            "mention_options",
-            "related_escalation_chains",
-        ),
+    permission_classes = (IsAuthenticated, RBACPermission)
+    rbac_permissions = {
+        # TODO: what permissions should go here?
+        "list": [],
+        "retrieve": [],
+        "create": [],
+        "update": [],
+        "destroy": [],
+        "reload_ical": [],
+        "export_token": [],
+        "events": [],
+        "filter_events": [],
+        "next_shifts_per_user": [],
+        "notify_empty_oncall_options": [],
+        "notify_oncall_shift_freq_options": [],
+        "mention_options": [],
+        "related_escalation_chains": [],
     }
+
     filter_backends = [SearchFilter]
     search_fields = ("name",)
 

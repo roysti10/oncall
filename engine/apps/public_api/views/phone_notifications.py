@@ -26,6 +26,8 @@ class MakeCallView(APIView):
         PhoneNotificationThrottler,
     ]
 
+    # TODO: what permissions should this fall under?
+
     def post(self, request):
         serializer = PhoneNotificationDataSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -59,6 +61,8 @@ class SendSMSView(APIView):
     throttle_classes = [
         PhoneNotificationThrottler,
     ]
+
+    # TODO: what permissions should this fall under?
 
     def post(self, request):
         serializer = PhoneNotificationDataSerializer(data=request.data)

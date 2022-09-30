@@ -3,9 +3,7 @@ import React from 'react';
 import { AppRootProps } from '@grafana/data';
 import { getLocationSrv } from '@grafana/runtime';
 import {
-  Alert,
   Button,
-  EmptySearchResult,
   HorizontalGroup,
   Icon,
   IconButton,
@@ -21,23 +19,17 @@ import Collapse from 'components/Collapse/Collapse';
 import EscalationsFilters from 'components/EscalationsFilters/EscalationsFilters';
 import Block from 'components/GBlock/Block';
 import GList from 'components/GList/GList';
-import IntegrationsFilters from 'components/IntegrationsFilters/IntegrationsFilters';
 import PluginLink from 'components/PluginLink/PluginLink';
 import Text from 'components/Text/Text';
 import Tutorial from 'components/Tutorial/Tutorial';
 import { TutorialStep } from 'components/Tutorial/Tutorial.types';
 import WithConfirm from 'components/WithConfirm/WithConfirm';
-import AlertReceiveChannelCard from 'containers/AlertReceiveChannelCard/AlertReceiveChannelCard';
 import EscalationChainCard from 'containers/EscalationChainCard/EscalationChainCard';
 import EscalationChainForm from 'containers/EscalationChainForm/EscalationChainForm';
 import EscalationChainSteps from 'containers/EscalationChainSteps/EscalationChainSteps';
-import GSelect from 'containers/GSelect/GSelect';
-import { IntegrationSettingsTab } from 'containers/IntegrationSettings/IntegrationSettings.types';
 import { WithPermissionControl } from 'containers/WithPermissionControl/WithPermissionControl';
-import { AlertReceiveChannel } from 'models/alert_receive_channel';
-import { ChannelFilter } from 'models/channel_filter/channel_filter.types';
 import { EscalationChain } from 'models/escalation_chain/escalation_chain.types';
-import { SelectOption, WithStoreProps } from 'state/types';
+import { WithStoreProps } from 'state/types';
 import { UserAction } from 'state/userAction';
 import { withMobXProviderContext } from 'state/withStore';
 import { openWarningNotification } from 'utils';
@@ -141,7 +133,7 @@ class EscalationChainsPage extends React.Component<EscalationChainsPageProps, Es
           {!searchResult || searchResult.length ? (
             <div className={cx('escalations')}>
               <div className={cx('left-column')}>
-                <WithPermissionControl userAction={UserAction.UpdateAlertReceiveChannels}>
+                <WithPermissionControl userAction={UserAction.AlertReceiveChannelsWrite}>
                   <Button
                     onClick={() => {
                       this.setState({ showCreateEscalationChainModal: true });
@@ -176,7 +168,7 @@ class EscalationChainsPage extends React.Component<EscalationChainsPageProps, Es
               title={
                 <VerticalGroup align="center" spacing="lg">
                   <Text type="secondary">No escalations found, check your filtering and current team.</Text>
-                  <WithPermissionControl userAction={UserAction.UpdateEscalationPolicies}>
+                  <WithPermissionControl userAction={UserAction.EscalationChainsWrite}>
                     <Button
                       icon="plus"
                       variant="primary"
@@ -250,7 +242,7 @@ class EscalationChainsPage extends React.Component<EscalationChainsPageProps, Es
           </Text>
           <div className={cx('buttons')}>
             <HorizontalGroup>
-              <WithPermissionControl userAction={UserAction.UpdateEscalationPolicies}>
+              <WithPermissionControl userAction={UserAction.EscalationChainsWrite}>
                 <IconButton
                   tooltip="Copy"
                   tooltipPlacement="top"
@@ -263,7 +255,7 @@ class EscalationChainsPage extends React.Component<EscalationChainsPageProps, Es
                   }}
                 />
               </WithPermissionControl>
-              <WithPermissionControl userAction={UserAction.UpdateEscalationPolicies}>
+              <WithPermissionControl userAction={UserAction.EscalationChainsWrite}>
                 <WithConfirm title={`Are you sure to remove "${escalationChain.name}"?`} confirmText="Remove">
                   <IconButton
                     disabled={escalationChain.number_of_integrations > 0}

@@ -1,12 +1,10 @@
 import React from 'react';
 
-import { SelectableValue } from '@grafana/data';
-import { HorizontalGroup, Icon, IconButton, Label, Tooltip } from '@grafana/ui';
+import { Icon, Label, Tooltip } from '@grafana/ui';
 import cn from 'classnames/bind';
 import { observer } from 'mobx-react';
 import ReactDOM from 'react-dom';
 
-import Avatar from 'components/Avatar/Avatar';
 import PluginLink from 'components/PluginLink/PluginLink';
 import GSelect from 'containers/GSelect/GSelect';
 import { WithPermissionControl } from 'containers/WithPermissionControl/WithPermissionControl';
@@ -46,7 +44,7 @@ const GrafanaTeamSelect = observer((props: GrafanaTeamSelectProps) => {
                 <Icon name="info-circle" size="md" className={cx('teamSelectInfo')}></Icon>
               </Tooltip>
             </Label>
-            <WithPermissionControl userAction={UserAction.UpdateTeams}>
+            <WithPermissionControl userAction={UserAction.TeamsWrite}>
               <PluginLink path="/org/teams" className={cx('teamSelectLink')}>
                 Edit teams
               </PluginLink>

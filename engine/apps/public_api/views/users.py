@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
+from apps.api.permissions import RBACPermission
 from apps.auth_token.auth import ApiTokenAuthentication, UserScheduleExportAuthentication
 from apps.public_api.custom_renderers import CalendarRenderer
 from apps.public_api.serializers import FastUserSerializer, UserSerializer
@@ -14,7 +15,6 @@ from apps.schedules.models import OnCallSchedule
 from apps.user_management.models import User
 from common.api_helpers.mixins import RateLimitHeadersMixin, ShortSerializerMixin
 from common.api_helpers.paginators import HundredPageSizePaginator
-from common.constants.role import Role
 
 
 class UserFilter(filters.FilterSet):
@@ -23,17 +23,16 @@ class UserFilter(filters.FilterSet):
     """
 
     email = filters.CharFilter(field_name="email", lookup_expr="iexact")
-    roles = filters.MultipleChoiceFilter(field_name="role", choices=Role.choices())
     username = filters.CharFilter(field_name="username", lookup_expr="iexact")
 
     class Meta:
         model = User
-        fields = ["email", "roles", "username"]
+        fields = ["email", "username"]
 
 
 class UserView(RateLimitHeadersMixin, ShortSerializerMixin, ReadOnlyModelViewSet):
     authentication_classes = (ApiTokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, RBACPermission)
 
     model = User
     pagination_class = HundredPageSizePaginator
@@ -44,6 +43,11 @@ class UserView(RateLimitHeadersMixin, ShortSerializerMixin, ReadOnlyModelViewSet
     filter_backends = (filters.DjangoFilterBackend,)
 
     throttle_classes = [UserThrottle]
+
+    rbac_permissions = {
+        "list": [RBACPermission.Permissions.USERS_READ],
+        "retrieve": [RBACPermission.Permissions.USERS_READ],
+    }
 
     def get_queryset(self):
         is_short_request = self.request.query_params.get("short", "false") == "true"
@@ -74,6 +78,7 @@ class UserView(RateLimitHeadersMixin, ShortSerializerMixin, ReadOnlyModelViewSet
         renderer_classes=(CalendarRenderer,),
         authentication_classes=(UserScheduleExportAuthentication,),
         permission_classes=(IsAuthenticated,),
+        # TODO: should we have a permission here?
     )
     def schedule_export(self, request, pk):
         schedules = OnCallSchedule.objects.filter(organization=self.request.auth.organization)

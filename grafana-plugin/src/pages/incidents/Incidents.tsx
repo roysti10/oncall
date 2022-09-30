@@ -3,14 +3,12 @@ import React, { ReactElement, SyntheticEvent } from 'react';
 import { AppRootProps } from '@grafana/data';
 import { getLocationSrv } from '@grafana/runtime';
 import { Button, Icon, Tooltip, VerticalGroup, LoadingPlaceholder, HorizontalGroup } from '@grafana/ui';
-import { capitalCase } from 'change-case';
 import cn from 'classnames/bind';
 import { get } from 'lodash-es';
 import { observer } from 'mobx-react';
 import moment from 'moment';
 import Emoji from 'react-emoji-render';
 
-import CardButton from 'components/CardButton/CardButton';
 import CursorPagination from 'components/CursorPagination/CursorPagination';
 import GTable from 'components/GTable/GTable';
 import IntegrationLogo from 'components/IntegrationLogo/IntegrationLogo';
@@ -21,12 +19,11 @@ import { TutorialStep } from 'components/Tutorial/Tutorial.types';
 import { IncidentsFiltersType } from 'containers/IncidentsFilters/IncidentFilters.types';
 import IncidentsFilters from 'containers/IncidentsFilters/IncidentsFilters';
 import { WithPermissionControl } from 'containers/WithPermissionControl/WithPermissionControl';
-import { MaintenanceIntegration } from 'models/alert_receive_channel';
-import { Alert, Alert as AlertType, AlertAction, IncidentStatus } from 'models/alertgroup/alertgroup.types';
+import { Alert, Alert as AlertType, AlertAction } from 'models/alertgroup/alertgroup.types';
 import { User } from 'models/user/user.types';
 import { getActionButtons, getIncidentStatusTag, renderRelatedUsers } from 'pages/incident/Incident.helpers';
 import { move } from 'state/helpers';
-import { SelectOption, WithStoreProps } from 'state/types';
+import { WithStoreProps } from 'state/types';
 import { UserAction } from 'state/userAction';
 import { withMobXProviderContext } from 'state/withStore';
 
@@ -182,14 +179,14 @@ class Incidents extends React.Component<IncidentsPageProps, IncidentsPageState> 
         <div className={cx('bulk-actions')}>
           <HorizontalGroup>
             {'resolve' in store.alertGroupStore.bulkActions && (
-              <WithPermissionControl key="resolve" userAction={UserAction.UpdateIncidents}>
+              <WithPermissionControl key="resolve" userAction={UserAction.AlertGroupsWrite}>
                 <Button disabled={!hasSelected} variant="primary" onClick={this.getBulkActionClickHandler('resolve')}>
                   Resolve
                 </Button>
               </WithPermissionControl>
             )}
             {'acknowledge' in store.alertGroupStore.bulkActions && (
-              <WithPermissionControl key="resolve" userAction={UserAction.UpdateIncidents}>
+              <WithPermissionControl key="resolve" userAction={UserAction.AlertGroupsWrite}>
                 <Button
                   disabled={!hasSelected}
                   variant="secondary"
@@ -200,14 +197,14 @@ class Incidents extends React.Component<IncidentsPageProps, IncidentsPageState> 
               </WithPermissionControl>
             )}
             {'silence' in store.alertGroupStore.bulkActions && (
-              <WithPermissionControl key="restart" userAction={UserAction.UpdateIncidents}>
+              <WithPermissionControl key="restart" userAction={UserAction.AlertGroupsWrite}>
                 <Button disabled={!hasSelected} variant="secondary" onClick={this.getBulkActionClickHandler('restart')}>
                   Restart
                 </Button>
               </WithPermissionControl>
             )}
             {'restart' in store.alertGroupStore.bulkActions && (
-              <WithPermissionControl key="silence" userAction={UserAction.UpdateIncidents}>
+              <WithPermissionControl key="silence" userAction={UserAction.AlertGroupsWrite}>
                 <SilenceDropdown disabled={!hasSelected} onSelect={this.getBulkActionClickHandler('silence')} />
               </WithPermissionControl>
             )}
@@ -225,7 +222,7 @@ class Incidents extends React.Component<IncidentsPageProps, IncidentsPageState> 
             }
 
             return (
-              <WithPermissionControl key={bulkAction.value} userAction={UserAction.UpdateIncidents}>
+              <WithPermissionControl key={bulkAction.value} userAction={UserAction.AlertGroupsWrite}>
                 <Button
                   disabled={!hasSelected}
                   icon={actionToIcon[bulkAction.value]}

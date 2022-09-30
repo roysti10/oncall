@@ -1,8 +1,4 @@
-# from unittest.mock import Mock, patch
-
 import pytest
-
-from common.constants.role import Role
 
 
 @pytest.mark.django_db
@@ -13,7 +9,7 @@ def test_self_or_admin(
     organization = make_organization()
     admin = make_user_for_organization(organization)
     second_admin = make_user_for_organization(organization)
-    editor = make_user_for_organization(organization, role=Role.EDITOR)
+    editor = make_user_for_organization(organization)
 
     another_organization = make_organization()
     admin_from_another_organization = make_user_for_organization(another_organization)

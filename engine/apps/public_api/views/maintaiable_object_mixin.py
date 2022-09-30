@@ -15,6 +15,7 @@ class MaintainableObjectMixin(viewsets.ViewSet):
 
     @action(detail=True, methods=["post"])
     def maintenance_start(self, request, pk) -> Response:
+        # TODO: should we check that the proper permission here?
         mode = str(request.data.get("mode", None)).lower()
         duration = request.data.get("duration", None)
 

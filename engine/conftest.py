@@ -150,6 +150,7 @@ def make_organization():
 
 @pytest.fixture
 def make_user_for_organization():
+    # TODO: modify this to use permissions...
     def _make_user_for_organization(organization, role=Role.ADMIN, **kwargs):
         post_save.disconnect(listen_for_user_model_save, sender=User)
         user = UserFactory(organization=organization, role=role, **kwargs)
@@ -191,6 +192,7 @@ def make_user_auth_headers():
 
 @pytest.fixture
 def make_user():
+    # TODO: modify this to use permissions...
     def _make_user(role=Role.ADMIN, **kwargs):
         user = UserFactory(role=role, **kwargs)
 
@@ -201,6 +203,7 @@ def make_user():
 
 @pytest.fixture
 def make_organization_and_user(make_organization, make_user_for_organization):
+    # TODO: modify this to use permissions...
     def _make_organization_and_user(role=Role.ADMIN):
         organization = make_organization()
         user = make_user_for_organization(organization=organization, role=role)
@@ -554,6 +557,7 @@ def mock_start_disable_maintenance_task(monkeypatch):
 
 @pytest.fixture()
 def make_organization_and_user_with_plugin_token(make_organization_and_user, make_token_for_organization):
+    # TODO: modify this to use permissions...
     def _make_organization_and_user_with_plugin_token(role=Role.ADMIN):
         organization, user = make_organization_and_user(role=role)
         _, token = make_token_for_organization(organization)

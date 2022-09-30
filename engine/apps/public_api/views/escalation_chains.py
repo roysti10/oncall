@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from apps.alerts.models import EscalationChain
+from apps.api.permissions import RBACPermission
 from apps.auth_token.auth import ApiTokenAuthentication
 from apps.public_api.serializers import EscalationChainSerializer
 from apps.public_api.serializers.escalation_chains import EscalationChainUpdateSerializer
@@ -16,7 +17,7 @@ from common.insight_log import EntityEvent, write_resource_insight_log
 
 class EscalationChainView(RateLimitHeadersMixin, UpdateSerializerMixin, ModelViewSet):
     authentication_classes = (ApiTokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, RBACPermission)
 
     throttle_classes = [UserThrottle]
 
@@ -28,6 +29,14 @@ class EscalationChainView(RateLimitHeadersMixin, UpdateSerializerMixin, ModelVie
 
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ByTeamFilter
+
+    rbac_permissions = {
+        "list": [RBACPermission.Permissions.ESCALATION_CHAINS_READ],
+        "retrieve": [RBACPermission.Permissions.ESCALATION_CHAINS_READ],
+        "create": [RBACPermission.Permissions.ESCALATION_CHAINS_WRITE],
+        "update": [RBACPermission.Permissions.ESCALATION_CHAINS_WRITE],
+        "destroy": [RBACPermission.Permissions.ESCALATION_CHAINS_WRITE],
+    }
 
     def get_queryset(self):
         queryset = self.request.auth.organization.escalation_chains.all()
