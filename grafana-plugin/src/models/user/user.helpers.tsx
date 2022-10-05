@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { pick } from 'lodash-es';
 
 import { User } from './user.types';

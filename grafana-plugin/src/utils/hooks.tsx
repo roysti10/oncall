@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 
 import { AppRootProps, NavModelItem } from '@grafana/data';
+import { GrafanaUser } from 'types';
 
 import NavBarSubtitle from 'components/NavBar/NavBarSubtitle';
 import { PageDefinition } from 'pages';
 
 import { APP_TITLE } from './consts';
-import { GrafanaUser } from 'types';
+
 
 type Args = {
   meta: AppRootProps['meta'];

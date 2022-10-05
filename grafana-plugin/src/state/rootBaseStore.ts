@@ -1,5 +1,6 @@
 import { AppPluginMeta } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
+import { contextSrv } from 'grafana/app/core/core';
 import { action, observable } from 'mobx';
 import moment from 'moment-timezone';
 import qs from 'query-string';
@@ -35,7 +36,6 @@ import { getPluginSyncStatus, installPlugin, startPluginSync } from './plugin';
 import { UserAction } from './userAction';
 
 // @ts-ignore
-import { contextSrv } from 'grafana/app/core/core';
 
 // ------ Dashboard ------ //
 
