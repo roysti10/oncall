@@ -7,6 +7,11 @@ import cn from 'classnames/bind';
 import { observer } from 'mobx-react';
 
 import GTable from 'components/GTable/GTable';
+import PageErrorHandlingWrapper, { PageBaseState } from 'components/PageErrorHandlingWrapper/PageErrorHandlingWrapper';
+import {
+  getWrongTeamResponseInfo,
+  initErrorDataState,
+} from 'components/PageErrorHandlingWrapper/PageErrorHandlingWrapper.helpers';
 import PluginLink from 'components/PluginLink/PluginLink';
 import Text from 'components/Text/Text';
 import WithConfirm from 'components/WithConfirm/WithConfirm';
@@ -24,13 +29,15 @@ const cx = cn.bind(styles);
 
 interface OutgoingWebhooksProps extends WithStoreProps, AppRootProps {}
 
-interface OutgoingWebhooksState {
+interface OutgoingWebhooksState extends PageBaseState {
   outgoingWebhookIdToEdit?: OutgoingWebhook['id'] | 'new';
 }
 
 @observer
 class OutgoingWebhooks extends React.Component<OutgoingWebhooksProps, OutgoingWebhooksState> {
-  state: OutgoingWebhooksState = {};
+  state: OutgoingWebhooksState = {
+    errorData: initErrorDataState(),
+  };
 
   async componentDidMount() {
     this.update().then(this.parseQueryParams);
@@ -42,27 +49,42 @@ class OutgoingWebhooks extends React.Component<OutgoingWebhooksProps, OutgoingWe
     }
   }
 
-  parseQueryParams = () => {
+  parseQueryParams = async () => {
+    this.setState((prevState) => ({
+      errorData: initErrorDataState(),
+      outgoingWebhookIdToEdit: undefined,
+    })); // reset state on query parse
+
     const {
       store,
       query: { id },
     } = this.props;
 
-    if (id) {
+    if (!id) {return;}
+
+    let outgoingWebhook: OutgoingWebhook | void = undefined;
+    const isNewWebhook = id === 'new';
+
+    if (!isNewWebhook) {
+      outgoingWebhook = await store.outgoingWebhookStore
+        .loadItem(id, true)
+        .catch((error) => this.setState({ errorData: { ...getWrongTeamResponseInfo(error) } }));
+    }
+
+    if (outgoingWebhook || isNewWebhook) {
       this.setState({ outgoingWebhookIdToEdit: id });
     }
   };
 
   update = () => {
     const { store } = this.props;
-    const { selectedAlertReceiveChannel } = store;
 
     return store.outgoingWebhookStore.updateItems();
   };
 
   render() {
-    const { store } = this.props;
-    const { outgoingWebhookIdToEdit } = this.state;
+    const { store, query } = this.props;
+    const { outgoingWebhookIdToEdit, errorData } = this.state;
 
     const webhooks = store.outgoingWebhookStore.getSearchResult();
 
@@ -85,39 +107,48 @@ class OutgoingWebhooks extends React.Component<OutgoingWebhooksProps, OutgoingWe
     ];
 
     return (
-      <>
-        <div className={cx('root')}>
-          <GTable
-            emptyText={webhooks ? 'No outgoing webhooks found' : 'Loading...'}
-            title={() => (
-              <div className={cx('header')}>
-                <Text.Title level={3}>Outgoing Webhooks</Text.Title>
-                <PluginLink
-                  partial
-                  query={{ id: 'new' }}
-                  disabled={!store.isUserActionAllowed(UserAction.OutgoingWebhooksWrite)}
-                >
-                  <WithPermissionControl userAction={UserAction.OutgoingWebhooksWrite}>
-                    <Button variant="primary" icon="plus">
-                      Create
-                    </Button>
-                  </WithPermissionControl>
-                </PluginLink>
-              </div>
+      <PageErrorHandlingWrapper
+        errorData={errorData}
+        objectName="outgoing webhook"
+        pageName="outgoing_webhooks"
+        itemNotFoundMessage={`Outgoing webhook with id=${query?.id} is not found. Please select outgoing webhook from the list.`}
+      >
+        {() => (
+          <>
+            <div className={cx('root')}>
+              <GTable
+                emptyText={webhooks ? 'No outgoing webhooks found' : 'Loading...'}
+                title={() => (
+                  <div className={cx('header')}>
+                    <Text.Title level={3}>Outgoing Webhooks</Text.Title>
+                    <PluginLink
+                      partial
+                      query={{ id: 'new' }}
+                      disabled={!store.isUserActionAllowed(UserAction.OutgoingWebhooksWrite)}
+                    >
+                      <WithPermissionControl userAction={UserAction.OutgoingWebhooksWrite}>
+                        <Button variant="primary" icon="plus">
+                          Create
+                        </Button>
+                      </WithPermissionControl>
+                    </PluginLink>
+                  </div>
+                )}
+                rowKey="id"
+                columns={columns}
+                data={webhooks}
+              />
+            </div>
+            {outgoingWebhookIdToEdit && (
+              <OutgoingWebhookForm
+                id={outgoingWebhookIdToEdit}
+                onUpdate={this.update}
+                onHide={this.handleOutgoingWebhookFormHide}
+              />
             )}
-            rowKey="id"
-            columns={columns}
-            data={webhooks}
-          />
-        </div>
-        {outgoingWebhookIdToEdit && (
-          <OutgoingWebhookForm
-            id={outgoingWebhookIdToEdit}
-            onUpdate={this.update}
-            onHide={this.handleOutgoingWebhookFormHide}
-          />
+          </>
         )}
-      </>
+      </PageErrorHandlingWrapper>
     );
   }
 

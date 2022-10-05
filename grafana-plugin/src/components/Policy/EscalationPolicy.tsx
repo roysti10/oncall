@@ -269,15 +269,15 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
 
     return (
       <WithPermissionControl key="notify_schedule" disableByPaywall userAction={UserAction.EscalationChainsWrite}>
-        <RemoteSelect
-          showSearch={false}
+        <GSelect
+          modelName="scheduleStore"
+          displayField="name"
+          valueField="id"
+          placeholder="Select Schedule"
           className={cx('select', 'control')}
           value={notify_schedule}
-          valueField="id"
           onChange={this._getOnChangeHandler('notify_schedule')}
-          href={'/schedules/?short=true'}
-          fieldToShow="name"
-          placeholder="Select Schedule"
+          fromOrganization
         />
       </WithPermissionControl>
     );
@@ -316,6 +316,7 @@ export class EscalationPolicy extends React.Component<EscalationPolicyProps, any
           className={cx('select', 'control')}
           value={custom_button_trigger}
           onChange={this._getOnChangeHandler('custom_button_trigger')}
+          fromOrganization
         />
       </WithPermissionControl>
     );

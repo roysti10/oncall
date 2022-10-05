@@ -156,7 +156,7 @@ export const Root = observer((props: AppRootProps) => {
 
   return (
     <DefaultPageLayout {...props}>
-      <GrafanaTeamSelect />
+      <GrafanaTeamSelect currentPage={page} />
       {userHasAccess ? (
         <PageComponent {...props} path={pathWithoutLeadingSlash} />
       ) : (
