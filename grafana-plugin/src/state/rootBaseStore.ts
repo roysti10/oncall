@@ -1,5 +1,6 @@
 import { AppPluginMeta } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
+// @ts-ignore
 import { contextSrv } from 'grafana/app/core/core';
 import { action, observable } from 'mobx';
 import moment from 'moment-timezone';
